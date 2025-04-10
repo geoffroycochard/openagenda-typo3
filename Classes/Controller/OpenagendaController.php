@@ -288,7 +288,7 @@ class OpenagendaController extends ActionController
                     $previous_event_context = $this->openagendaHelper->encodeContext($context['index'] - 1, $context['total'], $filters, $this->settings['calendarUid']);
                     $previousEvent = $this->openagendaConnector->getEventBySlug($this->settings['calendarUid'], $entities['event']['previousEventSlug'], $this->config['includeEmbedded']);
                     $variables['previous_event_url'] = $this->openagendaHelper
-                        ->createEventUrl($previousEvent['uid'], $entities['event']['previousEventSlug'], $previous_event_context);
+                        ->createEventUrl($previousEvent['uid'], $entities['event']['previousEventSlug'], $previous_event_context, (int) $this->settings['agendaPid']);
                 }
 
                 // Add a link if we found a next event with those search parameters.
@@ -296,7 +296,7 @@ class OpenagendaController extends ActionController
                     $next_event_context = $this->openagendaHelper->encodeContext($context['index'] + 1, $context['total'], $filters, $this->settings['calendarUid']);
                     $nextEvent = $this->openagendaConnector->getEventBySlug($this->settings['calendarUid'], $entities['event']['nextEventSlug'], $this->config['includeEmbedded']);
                     $variables['next_event_url'] = $this->openagendaHelper
-                        ->createEventUrl($nextEvent['uid'], $entities['event']['nextEventSlug'], $next_event_context);
+                        ->createEventUrl($nextEvent['uid'], $entities['event']['nextEventSlug'], $next_event_context, (int) $this->settings['agendaPid']);
                 }
             }
         } else {
@@ -398,8 +398,7 @@ class OpenagendaController extends ActionController
 					$queryInfo['settingsOpenagendaLanguage'],
 					$queryInfo['settingsOpenagendaLanguageId'],
 					$filters,
-					// $queryInfo['settingsOpenagendaPage'],
-					null,
+					(int) $filters['settingsOpenagendaPage'] ?? 0,
 					false,
 					false
 				);
