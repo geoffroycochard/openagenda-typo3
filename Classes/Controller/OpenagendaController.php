@@ -122,7 +122,8 @@ class OpenagendaController extends ActionController
     {
         $arguments = $this->request->getArguments();
         $this->settings['language'] = $this->openagendaHelper->getLanguage($this->settings['language']);
-
+        $page = (int) $this->settings['agendaPid'];
+        
 		// Get Filters and preFilters
 		$filters = $this->openagendaService->getFilters($this->settings['preFilter'], $this->config['current']);
 
@@ -146,7 +147,8 @@ class OpenagendaController extends ActionController
 				$this->settings['calendarUid'],
 				$this->settings['language'],
 				$this->openagendaHelper->getLanguageId(),
-				$filters);
+				$filters,
+				(int) $this->settings['agendaPid']);
         } else {
             $erreur = true;
         }
