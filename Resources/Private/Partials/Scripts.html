@@ -3,11 +3,10 @@
 
     <f:if condition="{config.default_style} == 'agenda'">
         <f:then>
-            <f:asset.script identifier="openagenda" src="EXT:openagenda/Resources/Public/JavaScript/agenda.bundle.js" />
+            <f:asset.script identifier="openagenda" src="EXT:openagenda/Resources/Public/JavaScript/agenda.bundle.js" useNonce="true" />
         </f:then>
     </f:if>
-
-    <script type="text/javascript">
+    <f:asset.script identifier="openagenda-inline-config" useNonce="true">
         <f:if condition="{event.location.latitude}">
             const settingsOpenagendaEventLat = '{event.location.latitude}';
         </f:if>
@@ -27,7 +26,7 @@
         const settingsOpenagendaLanguage = '{language}';
         const settingsOpenagendaColumns = {settings.columns};
         const settingsOpenagendaEventsPerPage = '{settings.eventsPerPage}';
-    </script>
+    </f:asset.script>
 
     <f:if condition="{richSnippet}">
         <script type="application/ld+json">
