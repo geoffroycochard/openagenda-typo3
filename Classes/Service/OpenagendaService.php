@@ -214,7 +214,7 @@ class OpenagendaService
 			if(!is_null($languageUid)) {
 				$event['local_url'] = $this->openagendaHelper->createEventUrl($event['uid'], $event['slug'], $serialized_context, $page, $languageUid, $preview);
 			} else {
-				$event['local_url'] = $this->openagendaHelper->createEventUrl($event['uid'], $event['slug'], $serialized_context);
+				$event['local_url'] = $this->openagendaHelper->createEventUrl($event['uid'], $event['slug'], $serialized_context, $page);
 			}
 		}
 
