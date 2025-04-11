@@ -122,7 +122,7 @@ class OpenagendaController extends ActionController
     {
         $arguments = $this->request->getArguments();
         $this->settings['language'] = $this->openagendaHelper->getLanguage($this->settings['language']);
-        $page = (int) $this->settings['agendaPid'];
+        $page = isset($this->settings['agendaPid']) ? (int)$this->settings['agendaPid'] : 0;
         
 		// Get Filters and preFilters
 		$filters = $this->openagendaService->getFilters($this->settings['preFilter'], $this->config['current']);
@@ -288,16 +288,18 @@ class OpenagendaController extends ActionController
                 if (!empty($entities['event']['previousEventSlug'])) {
                     $previous_event_context = $this->openagendaHelper->encodeContext($context['index'] - 1, $context['total'], $filters, $this->settings['calendarUid']);
                     $previousEvent = $this->openagendaConnector->getEventBySlug($this->settings['calendarUid'], $entities['event']['previousEventSlug'], $this->config['includeEmbedded']);
+                    $agendaPid = isset($this->settings['agendaPid']) ? (int)$this->settings['agendaPid'] : 0;
                     $variables['previous_event_url'] = $this->openagendaHelper
-                        ->createEventUrl($previousEvent['uid'], $entities['event']['previousEventSlug'], $previous_event_context, (int) $this->settings['agendaPid']);
+                        ->createEventUrl($previousEvent['uid'], $entities['event']['previousEventSlug'], $previous_event_context, $agendaPid);
                 }
 
                 // Add a link if we found a next event with those search parameters.
                 if (!empty($entities['event']['nextEventSlug'])) {
                     $next_event_context = $this->openagendaHelper->encodeContext($context['index'] + 1, $context['total'], $filters, $this->settings['calendarUid']);
                     $nextEvent = $this->openagendaConnector->getEventBySlug($this->settings['calendarUid'], $entities['event']['nextEventSlug'], $this->config['includeEmbedded']);
+                    $agendaPid = isset($this->settings['agendaPid']) ? (int)$this->settings['agendaPid'] : 0;
                     $variables['next_event_url'] = $this->openagendaHelper
-                        ->createEventUrl($nextEvent['uid'], $entities['event']['nextEventSlug'], $next_event_context, (int) $this->settings['agendaPid']);
+                        ->createEventUrl($nextEvent['uid'], $entities['event']['nextEventSlug'], $next_event_context, $agendaPid);
                 }
             }
         } else {
