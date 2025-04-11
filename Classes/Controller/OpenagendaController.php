@@ -140,6 +140,7 @@ class OpenagendaController extends ActionController
         $filtersUrlPagination = !empty($filtersPagination) ? http_build_query($filtersPagination) : '';
 
         if(!empty($variables['events']['events'])) {
+            $agendaPid = isset($this->settings['agendaPid']) ? (int)$this->settings['agendaPid'] : 0;
             $events = $this->openagendaService->processEvents(
 				$variables['events']['events'],
 				$variables['events']['total'],
@@ -148,7 +149,7 @@ class OpenagendaController extends ActionController
 				$this->settings['language'],
 				$this->openagendaHelper->getLanguageId(),
 				$filters,
-				(int) $this->settings['agendaPid']);
+				$agendaPid);
         } else {
             $erreur = true;
         }
