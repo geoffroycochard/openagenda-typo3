@@ -8,7 +8,6 @@ use Openagenda\Openagenda\Utility\OpenagendaConnectorUtilityInterface;
 use Openagenda\Openagenda\Utility\OpenagendaEventProcessorUtility;
 use Openagenda\Openagenda\Utility\OpenagendaHelperUtility;
 use Openagenda\Openagenda\Utility\OpenagendaConnectorUtility;
-use Openagenda\Openagenda\Utility\OpenagendaPaginationUtility;
 use Openagenda\Openagenda\Service\OpenagendaService;
 use OpenAgendaSdk\OpenAgendaSdk;
 use Psr\Http\Message\ResponseFactoryInterface;
@@ -18,7 +17,6 @@ use TYPO3\CMS\Core\Configuration\Exception\ExtensionConfigurationExtensionNotCon
 use TYPO3\CMS\Core\Configuration\Exception\ExtensionConfigurationPathDoesNotExistException;
 use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 use TYPO3\CMS\Core\Context\Exception\AspectNotFoundException;
-use TYPO3\CMS\Core\Pagination\ArrayPaginator;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 use TYPO3\CMS\Extbase\Mvc\Web\Routing\UriBuilder;
