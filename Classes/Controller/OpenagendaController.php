@@ -124,6 +124,7 @@ class OpenagendaController extends ActionController
         
 		// Get Filters and preFilters
 		$filters = $this->openagendaService->getFilters($this->settings['preFilter'], $this->config['current']);
+        $filters['agendaPid'] = $page;
 
         $from = (isset($arguments['page']) && $arguments['page'] > 0) ? ($arguments['page'] - 1) * (int) $this->settings['eventsPerPage'] : 0;
         $variables['entity'] = json_decode($this->sdk->getAgenda($this->settings['calendarUid']));
@@ -183,7 +184,6 @@ class OpenagendaController extends ActionController
         $this->view->assign('filtersUrl', $variables['search_string']);
         $this->view->assign('filtersUrlPagination', $filtersUrlPagination);
         $this->view->assign('pagination', $pagination);
-
         return $this->htmlResponse();
     }
 
@@ -399,7 +399,7 @@ class OpenagendaController extends ActionController
 					$queryInfo['settingsOpenagendaLanguage'],
 					$queryInfo['settingsOpenagendaLanguageId'],
 					$filters,
-					(int) $filters['settingsOpenagendaPage'] ?? 0,
+					(int) $filters['agendaPid'] ?? $filters['settingsOpenagendaPage'] ?? 0,
 					false,
 					false
 				);
