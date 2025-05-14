@@ -121,11 +121,13 @@ class OpenagendaController extends ActionController
         $arguments = $this->request->getArguments();
         $this->settings['language'] = $this->openagendaHelper->getLanguage($this->settings['language']);
         $page = isset($this->settings['agendaPid']) ? (int)$this->settings['agendaPid'] : 0;
-        
+
+        // Manage single page
+        $singlePageId = $this->settings['agendaPid'] ?? 0;
+
 		// Get Filters and preFilters
 		$filters = $this->openagendaService->getFilters($this->settings['preFilter'], $this->config['current']);
-        $filters['agendaPid'] = $page;
-
+        
         $from = (isset($arguments['page']) && $arguments['page'] > 0) ? ($arguments['page'] - 1) * (int) $this->settings['eventsPerPage'] : 0;
         $variables['entity'] = json_decode($this->sdk->getAgenda($this->settings['calendarUid']));
         $variables['events'] = $this->openagendaConnector->getAgendaEvents($this->settings['calendarUid'], $filters, $from, OpenagendaConnectorUtilityInterface::DEFAULT_EVENTS_SIZE, NULL, $this->config['includeEmbedded']);
@@ -139,7 +141,6 @@ class OpenagendaController extends ActionController
         $filtersUrlPagination = !empty($filtersPagination) ? http_build_query($filtersPagination) : '';
 
         if(!empty($variables['events']['events'])) {
-            $agendaPid = isset($this->settings['agendaPid']) ? (int)$this->settings['agendaPid'] : 0;
             $events = $this->openagendaService->processEvents(
 				$variables['events']['events'],
 				$variables['events']['total'],
@@ -148,7 +149,7 @@ class OpenagendaController extends ActionController
 				$this->settings['language'],
 				$this->openagendaHelper->getLanguageId(),
 				$filters,
-				$agendaPid);
+				$singlePageId);
         } else {
             $erreur = true;
         }
@@ -178,6 +179,7 @@ class OpenagendaController extends ActionController
         $this->view->assign('total', $variables['events']['total'] ?? 0);
         $this->view->assign('events', $events);
         $this->view->assign('currentPage', $GLOBALS['TSFE']->id);
+        $this->view->assign('singlePageId', $singlePageId);
         $this->view->assign('language', $this->settings['language']);
         $this->view->assign('languageId', $this->openagendaHelper->getLanguageId());
         $this->view->assign('additionalFields', $additionalFields);
@@ -262,6 +264,9 @@ class OpenagendaController extends ActionController
         $context = !empty($oac) ? $this->openagendaHelper->decodeContext($oac) : [];
         $filters = $context['filters'] ?? [];
 
+        // Manage single page
+        $singlePageId = $this->settings['agendaPid'] ?? 0;
+
 		// Agenda URLs
 		$agendaUrlBase = $this->openagendaService->getAgendaURLBase();
 		$agendaUrl = $this->openagendaService->getAgendaURLWithFilters($agendaUrlBase, $filters);
@@ -286,18 +291,17 @@ class OpenagendaController extends ActionController
                 if (!empty($entities['event']['previousEventSlug'])) {
                     $previous_event_context = $this->openagendaHelper->encodeContext($context['index'] - 1, $context['total'], $filters, $this->settings['calendarUid']);
                     $previousEvent = $this->openagendaConnector->getEventBySlug($this->settings['calendarUid'], $entities['event']['previousEventSlug'], $this->config['includeEmbedded']);
-                    $agendaPid = isset($this->settings['agendaPid']) ? (int)$this->settings['agendaPid'] : 0;
+                    
                     $variables['previous_event_url'] = $this->openagendaHelper
-                        ->createEventUrl($previousEvent['uid'], $entities['event']['previousEventSlug'], $previous_event_context, $agendaPid);
+                        ->createEventUrl($previousEvent['uid'], $entities['event']['previousEventSlug'], $previous_event_context, $singlePageId);
                 }
 
                 // Add a link if we found a next event with those search parameters.
                 if (!empty($entities['event']['nextEventSlug'])) {
                     $next_event_context = $this->openagendaHelper->encodeContext($context['index'] + 1, $context['total'], $filters, $this->settings['calendarUid']);
                     $nextEvent = $this->openagendaConnector->getEventBySlug($this->settings['calendarUid'], $entities['event']['nextEventSlug'], $this->config['includeEmbedded']);
-                    $agendaPid = isset($this->settings['agendaPid']) ? (int)$this->settings['agendaPid'] : 0;
                     $variables['next_event_url'] = $this->openagendaHelper
-                        ->createEventUrl($nextEvent['uid'], $entities['event']['nextEventSlug'], $next_event_context, $agendaPid);
+                        ->createEventUrl($nextEvent['uid'], $entities['event']['nextEventSlug'], $next_event_context, $singlePageId);
                 }
             }
         } else {
@@ -369,15 +373,16 @@ class OpenagendaController extends ActionController
 	 */
     public function ajaxCallbackAction(): ResponseInterface
     {
-		// Get Filters and preFilters
+        // Get Filters and preFilters
 		$filters = $this->openagendaService->getFilters(null, $this->config['current'], true);
         $filtersUrl = !empty($filters) ? http_build_query($filters) : '';
-
+        
         $filtersPagination = $filters;
         unset($filtersPagination['tx_openagenda_agenda']['page']);
         $filtersUrlPagination = !empty($filtersPagination) ? http_build_query($filtersPagination) : '';
-
+        
 		$queryInfo = $this->openagendaService->getQueryInfo();
+        
         $agenda = json_decode($this->sdk->getAgenda($queryInfo['settingsOpenagendaCalendarUid']));
 
         $response = $this->responseFactory->createResponse()
@@ -389,6 +394,12 @@ class OpenagendaController extends ActionController
             $currentPage = $filters['tx_openagenda_agenda']['page'] ?? 1;
             $from = ($currentPage - 1) * (int) $queryInfo['settingsOpenagendaEventsPerPage'];
             $entities = $this->openagendaAgendaProcessor->buildRenderArray($queryInfo['settingsOpenagendaCalendarUid'], $agenda, TRUE, $currentPage, $queryInfo['settingsOpenagendaLanguage'], $queryInfo['settingsOpenagendaEventsPerPage'], $queryInfo['settingsOpenagendaColumns'], $queryInfo['settingsOpenagendaPreFilter']);
+            
+            if (isset($filters['agendaPid'])) {
+                $filters['settingsOpenagendaPage'] = (int) $filters['agendaPid'];
+            } else {
+                $filters['settingsOpenagendaPage'] = (int) $filters['settingsOpenagendaPage'];
+            }
 
             if(!empty($entities['events'])) {
 				$events = $this->openagendaService->processEvents(
@@ -399,7 +410,7 @@ class OpenagendaController extends ActionController
 					$queryInfo['settingsOpenagendaLanguage'],
 					$queryInfo['settingsOpenagendaLanguageId'],
 					$filters,
-					(int) $filters['agendaPid'] ?? $filters['settingsOpenagendaPage'] ?? 0,
+					(int) $queryInfo['singlePageId'] ?? 0,
 					false,
 					false
 				);
