@@ -123,7 +123,7 @@ class OpenagendaController extends ActionController
         $page = isset($this->settings['agendaPid']) ? (int)$this->settings['agendaPid'] : 0;
 
         // Manage single page
-        $singlePageId = $this->settings['agendaPid'] ?? 0;
+        $singlePageId = (int) $this->settings['agendaPid'] ?? 0;
 
 		// Get Filters and preFilters
 		$filters = $this->openagendaService->getFilters($this->settings['preFilter'], $this->config['current']);
@@ -266,12 +266,11 @@ class OpenagendaController extends ActionController
         $filters = $context['filters'] ?? [];
 
         // Manage single page
-        $singlePageId = $this->settings['agendaPid'] ?? 0;
+        $singlePageId = (int) $this->settings['agendaPid'] ?? 0;
 
 		// Agenda URLs
         $backAgendaPid = $this->settings['backAgendaPid'] ?? 0;
 		$agendaUrlBase = $this->openagendaService->getAgendaURLBase($this->settings['language'], $backAgendaPid);
-        dd($backAgendaPid, $agendaUrlBase);
 		$agendaUrl = $this->openagendaService->getAgendaURLWithFilters($agendaUrlBase, $filters);
 
         // Make sure our index and total values make sense.

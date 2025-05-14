@@ -142,7 +142,14 @@ class OpenagendaService
 	 */
 	public function getAgendaURLWithFilters(string $url, array $filters): string
 	{
-		return $url . '?' . http_build_query($filters);
+		// Gérer l'ancre dans l'URL
+		$anchor = '';
+		if (strpos($url, '#') !== false) {
+			[$url, $anchor] = explode('#', $url);
+			$anchor = "#{$anchor}";
+		}
+		
+		return $url . '?' . http_build_query($filters) . $anchor;
 	}
 
 	/**
