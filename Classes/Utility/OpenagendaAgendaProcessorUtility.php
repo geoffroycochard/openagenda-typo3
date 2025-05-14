@@ -133,7 +133,7 @@ class OpenagendaAgendaProcessorUtility implements OpenagendaAgendaProcessorUtili
             ];
         }
         $filters += $preFilters;
-
+        
         // Get events.
         $data = $this->openagendaConnector->getAgendaEvents($calendarUid, $filters, $from, $size, NULL, (bool) $this->config['includeEmbedded']);
 
@@ -142,7 +142,7 @@ class OpenagendaAgendaProcessorUtility implements OpenagendaAgendaProcessorUtili
         if ($from > $total) {
             $page = floor(($total - 1) / $size) + 1;
 
-            return $this->buildRenderArray($event, FALSE, $page);
+            return $this->buildRenderArray($calendarUid, $event, FALSE, $page);
         }
 
         // Localize events.
