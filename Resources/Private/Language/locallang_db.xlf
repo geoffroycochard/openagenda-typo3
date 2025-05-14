@@ -82,11 +82,13 @@
 				<source>OpenAgenda Page</source>
 			</trans-unit>
 			<trans-unit id="preview.displayAgendaLink">
-				<target>Display Agenda page link</target>
+				<source>Display Agenda page link</source>
 			</trans-unit>
 			<trans-unit id="agenda.agendaPid">
-				<source>Page de l'agenda</source>
-				<target>Page de l'agenda</target>
+				<source>Detail page of the agenda</source>
+			</trans-unit>
+			<trans-unit id="agenda.backAgendaPid">
+				<source>Back page of the agenda</source>
 			</trans-unit>
 		</body>
 	</file>

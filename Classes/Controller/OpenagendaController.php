@@ -223,7 +223,8 @@ class OpenagendaController extends ActionController
         }
 
 		// Agenda URLs
-		$agendaUrlBase = $this->openagendaService->getAgendaURLBase();
+		$backAgendaPid = (int) $this->settings['backAgendaPid'] ?? 0;
+		$agendaUrlBase = $this->openagendaService->getAgendaURLBase($this->settings['language'], $backAgendaPid);
 		$agendaUrl = $this->openagendaService->getAgendaURLWithFilters($agendaUrlBase, $filters);
 
         // Tracking
@@ -268,7 +269,9 @@ class OpenagendaController extends ActionController
         $singlePageId = $this->settings['agendaPid'] ?? 0;
 
 		// Agenda URLs
-		$agendaUrlBase = $this->openagendaService->getAgendaURLBase();
+        $backAgendaPid = $this->settings['backAgendaPid'] ?? 0;
+		$agendaUrlBase = $this->openagendaService->getAgendaURLBase($this->settings['language'], $backAgendaPid);
+        dd($backAgendaPid, $agendaUrlBase);
 		$agendaUrl = $this->openagendaService->getAgendaURLWithFilters($agendaUrlBase, $filters);
 
         // Make sure our index and total values make sense.

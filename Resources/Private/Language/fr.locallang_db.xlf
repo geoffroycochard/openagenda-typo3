@@ -84,6 +84,12 @@
 			<trans-unit id="preview.displayAgendaLink">
 				<target>Afficher le lien vers l'agenda</target>
 			</trans-unit>
+			<trans-unit id="preview.backAgendaPid">
+				<target>Page de retour</target>
+			</trans-unit>
+			<trans-unit id="preview.agendaPid">
+				<target>Page détail de l'agenda</target>
+			</trans-unit>
 		</body>
 	</file>
 </xliff>

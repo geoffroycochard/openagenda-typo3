@@ -98,11 +98,38 @@ class OpenagendaService
 	 * @param string|null $language
 	 * @return string
 	 */
-	public function getAgendaURLBase(string|null $language = null): string
+	public function getAgendaURLBase(string|null $language = null, string|null $backAgendaPid = null): string
 	{
 		$this->uriBuilder->reset();
 		if(!is_null($language)) {
 			$this->uriBuilder->setLanguage($language);
+		}
+
+		if($backAgendaPid) {
+			if(str_starts_with($backAgendaPid, 'tt_content_')) {
+				$contentUid = (int)substr($backAgendaPid, strlen('tt_content_'));
+				// Récupérer l'uid de la page contenant le tt_content
+				$queryBuilder = GeneralUtility::makeInstance(\TYPO3\CMS\Core\Database\ConnectionPool::class)
+					->getQueryBuilderForTable('tt_content');
+				$pageUid = $queryBuilder
+					->select('pid')
+					->from('tt_content')
+					->where($queryBuilder->expr()->eq('uid', $contentUid))
+					->executeQuery()
+					->fetchOne();
+
+				if ($pageUid) {
+					$this->uriBuilder
+						->setTargetPageUid((int)$pageUid)
+						->setSection('c' . $contentUid);
+				}
+			} elseif(str_starts_with($backAgendaPid, 'pages_')) {
+				// Cas où on pointe directement vers une page
+				$pageUid = (int)substr($backAgendaPid, strlen('pages_'));
+				$this->uriBuilder->setTargetPageUid($pageUid);
+			} else {
+				$this->uriBuilder->setTargetPageUid((int)$backAgendaPid);
+			}
 		}
 
 		return $this->uriBuilder->buildFrontendUri();
