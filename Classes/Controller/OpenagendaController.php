@@ -379,6 +379,7 @@ class OpenagendaController extends ActionController
 		$filters = $this->openagendaService->getFilters(null, $this->config['current'], true);
         $filtersUrl = !empty($filters) ? http_build_query($filters) : '';
         
+
         $filtersPagination = $filters;
         unset($filtersPagination['tx_openagenda_agenda']['page']);
         $filtersUrlPagination = !empty($filtersPagination) ? http_build_query($filtersPagination) : '';

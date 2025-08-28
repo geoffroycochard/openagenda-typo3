@@ -2,6 +2,7 @@
 
 namespace Openagenda\Openagenda\Service;
 
+use Openagenda\Openagenda\Utility\OpenagendaEventProcessorUtility;
 use Openagenda\Openagenda\Utility\OpenagendaHelperUtility;
 use Openagenda\Openagenda\Utility\OpenagendaPaginationUtility;
 use OpenAgendaSdk\OpenAgendaSdk;
@@ -28,6 +29,13 @@ class OpenagendaService
 	protected OpenagendaHelperUtility $openagendaHelper;
 
 	/**
+	 * OpenagendaEventProcessorUtility.
+	 *
+	 * @var OpenagendaEventProcessorUtility
+	 */
+	protected OpenagendaEventProcessorUtility $openagendaEventProcessor;
+
+	/**
 	 * UriBuilder.
 	 *
 	 * @var UriBuilder
@@ -41,6 +49,7 @@ class OpenagendaService
 	public function __construct(LoggerInterface $logger, string $publicKey)
 	{
 		$this->uriBuilder = GeneralUtility::makeInstance(UriBuilder::class);
+		$this->openagendaEventProcessor = GeneralUtility::makeInstance(OpenagendaEventProcessorUtility::class, $logger);
 		$this->sdk = new OpenAgendaSdk($publicKey);
 		$this->openagendaHelper = new OpenagendaHelperUtility($logger);
 	}
@@ -243,6 +252,7 @@ class OpenagendaService
 
 			// Set Relative timing
 			$event['relative_timing'] = $this->openagendaHelper->processRelativeTimingToEvent($event, $language);
+            $event['timetable'] = $this->openagendaEventProcessor->processEventTimetable($event, $language);
 
 			// Set event local link.
 			if(!is_null($languageUid)) {
