@@ -123,7 +123,7 @@ class OpenagendaController extends ActionController
         $page = isset($this->settings['agendaPid']) ? (int)$this->settings['agendaPid'] : 0;
 
         // Manage single page
-        $singlePageId = (int) $this->settings['agendaPid'] ?? 0;
+        $singlePageId = (int) ($this->settings['agendaPid'] ?? 0);
 
 		// Get Filters and preFilters
 		$filters = $this->openagendaService->getFilters($this->settings['preFilter'], $this->config['current']);
@@ -223,7 +223,7 @@ class OpenagendaController extends ActionController
         }
 
 		// Agenda URLs
-		$backAgendaPid = (int) $this->settings['backAgendaPid'] ?? 0;
+		$backAgendaPid = (int) ($this->settings['backAgendaPid'] ?? 0);
 		$agendaUrlBase = $this->openagendaService->getAgendaURLBase($this->settings['language'], $backAgendaPid);
 		$agendaUrl = $this->openagendaService->getAgendaURLWithFilters($agendaUrlBase, $filters);
 
@@ -257,16 +257,19 @@ class OpenagendaController extends ActionController
         $erreur = null;
         $this->settings['language'] = $this->openagendaHelper->getLanguage($this->settings['language']);
         $agenda = json_decode($this->sdk->getAgenda($this->settings['calendarUid']));
-        $event = json_decode($this->sdk->getEvent($this->settings['calendarUid'], $arguments['uid']), true);
+        $eventUid = (int) ($arguments['uid'] ?? 0);
+        $event = $eventUid > 0
+            ? json_decode($this->sdk->getEvent($this->settings['calendarUid'], $eventUid), true)
+            : null;
 
         $variables = array();
 
-        $oac = $arguments['oac'];
+        $oac = $arguments['oac'] ?? '';
         $context = !empty($oac) ? $this->openagendaHelper->decodeContext($oac) : [];
         $filters = $context['filters'] ?? [];
 
         // Manage single page
-        $singlePageId = (int) $this->settings['agendaPid'] ?? 0;
+        $singlePageId = (int) ($this->settings['agendaPid'] ?? 0);
 
 		// Agenda URLs
         $backAgendaPid = $this->settings['backAgendaPid'] ?? 0;
@@ -413,7 +416,7 @@ class OpenagendaController extends ActionController
 					$queryInfo['settingsOpenagendaLanguage'],
 					$queryInfo['settingsOpenagendaLanguageId'],
 					$filters,
-					(int) $queryInfo['singlePageId'] ?? 0,
+					(int) ($queryInfo['singlePageId'] ?? 0),
 					false,
 					false
 				);

@@ -70,7 +70,7 @@ class AddEventToMenuProcessor implements DataProcessorInterface
         $language = $this->cObj->getRequest()->getAttribute('language')->getTwoLetterIsoCode();
         $menu[] = [
             'data' => $event,
-            'title' => $event['title'][$language],
+            'title' => $event['title'][$language] ?? '',
             'active' => 1,
             'current' => 1,
             'link' => GeneralUtility::getIndpEnv('TYPO3_REQUEST_URL'),
@@ -95,10 +95,16 @@ class AddEventToMenuProcessor implements DataProcessorInterface
             $backendConfiguration = GeneralUtility::makeInstance(ExtensionConfiguration::class)
                 ->get('openagenda');
             $sdk = new OpenAgendaSdk($backendConfiguration['public_key']);
-            $context = json_decode(base64_decode($vars['tx_openagenda_agenda']['oac']), true);
-            $event = json_decode($sdk->getEvent($context['calendarUid'], $eventUid), true);
+            $oac = $vars['tx_openagenda_agenda']['oac'] ?? '';
+            $context = !empty($oac) ? json_decode(base64_decode($oac), true) : [];
+            $calendarUid = (int) ($context['calendarUid'] ?? 0);
 
-            if ($event['success']) {
+            if ($calendarUid <= 0) {
+                return [];
+            }
+
+            $event = json_decode($sdk->getEvent($calendarUid, $eventUid), true);
+            if (is_array($event) && !empty($event['success']) && !empty($event['event']) && is_array($event['event'])) {
                 return $event['event'];
             }
         }
