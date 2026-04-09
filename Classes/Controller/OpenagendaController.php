@@ -36,7 +36,7 @@ class OpenagendaController extends ActionController
      *
      * @var ResponseFactoryInterface
      */
-    protected $responseFactory;
+    protected ResponseFactoryInterface $responseFactory;
 
     /**
      * OpenagendaHelperUtility.
