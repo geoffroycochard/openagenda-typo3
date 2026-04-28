@@ -121,7 +121,7 @@ class OpenagendaHelperUtility implements OpenagendaHelperUtilityInterface
      * @return string
      *   The event's url.
      */
-    public function createEventUrl(int $event_uid, string $event_slug, string $oac, int $page = null, string $language = null, bool $preview = false): string
+    public function createEventUrl(int $event_uid, string $event_slug, string $oac, ?int $page = null, ?string $language = null, bool $preview = false): string
     {
         $parameters = [
             'uid' => $event_uid,
@@ -284,8 +284,10 @@ class OpenagendaHelperUtility implements OpenagendaHelperUtilityInterface
         $site = $GLOBALS['TYPO3_REQUEST']->getAttribute('site');
         $langId = $context->getPropertyFromAspect('language', 'id');
         $language = $site->getLanguageById($langId);
-        $langCode = $language->getTwoLetterIsoCode();
-        $ordered_langcodes[] = $langCode;
+        $langCode = $language->getLocale()->getLanguageCode();
+        if (!empty($langCode)) {
+            $ordered_langcodes[] = $langCode;
+        }
 
         foreach (array_reverse($ordered_langcodes) as $langcode) {
             $language = $language_list[$langcode];
@@ -471,10 +473,10 @@ class OpenagendaHelperUtility implements OpenagendaHelperUtilityInterface
         $context = GeneralUtility::makeInstance(Context::class);
         $site = $GLOBALS['TYPO3_REQUEST']->getAttribute('site');
         $langId = $context->getPropertyFromAspect('language', 'id');
-        $language = $site->getLanguageById($langId);
-        $langCode = $language->getTwoLetterIsoCode();
+        $siteLanguage = $site->getLanguageById($langId);
+        $langCode = $siteLanguage->getLocale()->getLanguageCode();
 
-        return $langCode ?: $language;
+        return $langCode ?: 'fr';
     }
 
     /**

@@ -67,7 +67,7 @@ class AddEventToMenuProcessor implements DataProcessorInterface
         }
 
         // Language ISO
-        $language = $this->cObj->getRequest()->getAttribute('language')->getTwoLetterIsoCode();
+        $language = $this->cObj->getRequest()->getAttribute('language')->getLocale()->getLanguageCode();
         $menu[] = [
             'data' => $event,
             'title' => $event['title'][$language] ?? '',
