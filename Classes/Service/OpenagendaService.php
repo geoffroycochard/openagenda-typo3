@@ -6,10 +6,14 @@ use Openagenda\Openagenda\Utility\OpenagendaEventProcessorUtility;
 use Openagenda\Openagenda\Utility\OpenagendaHelperUtility;
 use Openagenda\Openagenda\Utility\OpenagendaPaginationUtility;
 use OpenAgendaSdk\OpenAgendaSdk;
+use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 use TYPO3\CMS\Core\Context\Exception\AspectNotFoundException;
 use TYPO3\CMS\Core\Pagination\ArrayPaginator;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Mvc\ExtbaseRequestParameters;
+use TYPO3\CMS\Extbase\Mvc\Request;
+use TYPO3\CMS\Extbase\Mvc\RequestInterface;
 use TYPO3\CMS\Extbase\Mvc\Web\Routing\UriBuilder;
 
 class OpenagendaService
@@ -49,6 +53,7 @@ class OpenagendaService
 	public function __construct(LoggerInterface $logger, string $publicKey)
 	{
 		$this->uriBuilder = GeneralUtility::makeInstance(UriBuilder::class);
+		$this->uriBuilder->setRequest($this->getExtbaseRequest());
 		$this->openagendaEventProcessor = GeneralUtility::makeInstance(OpenagendaEventProcessorUtility::class, $logger);
 		$this->sdk = new OpenAgendaSdk($publicKey);
 		$this->openagendaHelper = new OpenagendaHelperUtility($logger);
@@ -263,5 +268,16 @@ class OpenagendaService
 		}
 
 		return $events;
+	}
+
+	private function getExtbaseRequest(): RequestInterface
+	{
+		/** @var ServerRequestInterface $request */
+		$request = $GLOBALS['TYPO3_REQUEST'];
+
+		// UriBuilder needs an Extbase request context before buildFrontendUri().
+		return new Request(
+			$request->withAttribute('extbase', new ExtbaseRequestParameters())
+		);
 	}
 }
